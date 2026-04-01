@@ -1,0 +1,151 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "devpro-orchestrator"
+version = "0.1.0"
+description = "DevPro Orchestrator: Advanced Multi-Agent Orchestration System with LangGraph supervisor"
+authors = [{ name = "Bjorn Melin" }]
+readme = "README.md"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+dependencies = [
+    # Core async and HTTP libraries
+    "aiosqlite>=0.21.0",
+    "httpx>=0.28.1",
+
+    # LangChain ecosystem - latest versions
+    "langchain-core>=0.3.72",
+    "langchain-groq>=0.3.6",
+    "langchain-openai>=0.3.28",
+    "langgraph>=0.6.2",
+    "langgraph-checkpoint-sqlite>=2.0.11",
+    "langgraph-supervisor>=0.0.29",
+
+    # AI/LLM providers
+    "groq>=0.30.0",
+    "openai>=1.98.0",
+
+    # Data processing and validation
+    "pandas>=2.3.1",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "sqlmodel>=0.0.24",
+
+    # CLI and UI
+    "rich>=14.1.0",
+    "typer>=0.16.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.31.0",
+    "python-multipart>=0.0.12",
+
+    # Configuration and environment
+    "python-dotenv>=1.1.1",
+    "pyyaml>=6.0.1",
+
+    # Web crawling and scraping
+    "crawl4ai>=0.4.3",
+    "playwright>=1.49.0",
+
+    # Database and persistence
+    # sqlite3 is built-in to Python
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0", "ruff>=0.10.0"]
+
+[project.urls]
+Repository = "https://github.com/BjornMelin/dev-pro-agents"
+Documentation = "https://github.com/BjornMelin/dev-pro-agents/docs"
+
+[project.scripts]
+dev-pro-agents = "src.cli:main"
+supervisor = "src.supervisor:main"
+task-manager = "src.task_manager:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.uv]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+    "N",
+    "B",
+    "S",
+    "C4",
+    "SIM",
+    "TC",
+    "ARG",
+    "PTH",
+    "RUF",
+    "D",
+    "T20",
+]
+ignore = [
+    "S101",
+    "S603",
+    "S607",
+    "S605",
+    "N999",
+    "D203",
+    "D213",
+    "D107",
+    "D104",
+    "D100",
+    "ARG002",
+    "T201",
+    "PLR0913",
+    "PLR0912",
+    "PLR2004",
+    "PLR0915",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "ARG001", "PLR2004", "D103"]
+"tests/**/test_*.py" = ["S101", "PLR2004", "D103"]
+"src/cli.py" = ["T201"]
+"src/supervisor.py" = ["PLR0915"]
+"**/__init__.py" = ["D104"]
+"src/**/__init__.py" = ["D104"]
+
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+markers = [
+    "integration: marks tests that require external services (API keys, network)",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*", "*/migrations/*", "*/venv/*", "*/.venv/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

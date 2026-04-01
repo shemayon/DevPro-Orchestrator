@@ -1,0 +1,24 @@
+# Use a lightweight Python base image
+FROM python:3.12-slim
+
+# Install uv for fast dependency management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Set working directory
+WORKDIR /app
+
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+
+# Copy project files
+COPY pyproject.toml uv.lock ./
+COPY src/ ./src/
+
+# Install dependencies using uv
+RUN uv sync --frozen --no-cache
+
+# Expose the API port
+EXPOSE 8000
+
+# Set entrypoint to run the FastAPI app
+CMD ["uv", "run", "python", "-m", "src.api"]

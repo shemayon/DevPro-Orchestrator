@@ -12,6 +12,14 @@ Featuring a **premium, real-time React dashboard**, DevPro Orchestrator provides
 
 ---
 
+## 🖼️ Dashboard Preview
+
+![DevPro Orchestrator Dashboard](1.png)
+
+![DevPro Orchestrator Task Execution](2.png)
+
+---
+
 ## ✨ Key Features
 
 - **🔄 Supervisor-Led Orchestration**: Intelligent task routing and coordination powered by LangGraph.

@@ -14,9 +14,9 @@ Featuring a **premium, real-time React dashboard**, DevPro Orchestrator provides
 
 ## 🖼️ Dashboard Preview
 
-![DevPro Orchestrator Dashboard](1.png)
+![DevPro Orchestrator Dashboard](./1.png)
 
-![DevPro Orchestrator Task Execution](2.png)
+![DevPro Orchestrator Task Execution](./2.png)
 
 ---
 

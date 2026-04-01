@@ -12,6 +12,14 @@ Featuring a **premium, real-time React dashboard**, DevPro Orchestrator provides
 
 ---
 
+## 🖼️ Dashboard Preview
+
+![DevPro Orchestrator Dashboard](1.png)
+
+![DevPro Orchestrator Task Execution](2.png)
+
+---
+
 ## ✨ Key Features
 
 - **🔄 Supervisor-Led Orchestration**: Intelligent task routing and coordination powered by LangGraph.
@@ -46,8 +54,8 @@ DevPro Orchestrator follows a modern, decoupled architecture:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com BjornMelin/dev-pro-agents.git
-   cd dev-pro-agents
+   git clone https://github.com/shemayon/DevPro-Orchestrator.git
+   cd DevPro-Orchestrator
    ```
 
 2. **Configure Environment**:
@@ -105,6 +113,4 @@ DevPro Orchestrator is managed using **uv** for ultra-fast dependency resolution
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
 
-> **Built with ⚡ by the DevPro Core Team**

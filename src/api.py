@@ -84,12 +84,14 @@ async def create_task(task: TaskCreate):
     try:
         # Map user-facing component area names to enum values
         component_map = {
-            "research": "task",   # default to task if no exact match
+            "research": "task",
             "core": "architecture",
             "integrations": "services",
             "ui": "ui",
             "testing": "testing",
             "documentation": "documentation",
+            "architecture": "architecture",
+            "services": "services"
         }
         area = task.component_area.lower()
         component_value = component_map.get(area, area)
@@ -124,6 +126,16 @@ async def get_task(task_id: int):
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     return task
+
+@app.delete("/tasks/{task_id}")
+async def delete_task(task_id: int):
+    task = task_manager.get_task(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    deleted = task_manager.delete_task(task_id)
+    if not deleted:
+        raise HTTPException(status_code=500, detail="Failed to delete task")
+    return {"message": f"Task {task_id} deleted successfully"}
 
 @app.post("/tasks/{task_id}/execute")
 async def execute_task(task_id: int, background_tasks: BackgroundTasks):

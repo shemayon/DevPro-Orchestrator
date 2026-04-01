@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    env_file:
+      - .env
+    expose:
+      - "8000"
+    volumes:
+      - .:/app
+    restart: always
+
+  # Frontend Build Stage
+  # (This service builds the dist and then exits, but we use it via volumes)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - frontend_dist:/app-dist
+
+  # Nginx Reverse Proxy & Static File Server
+  web:
+    image: nginx:stable-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - frontend_dist:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+      - frontend
+    restart: always
+
+volumes:
+  frontend_dist:

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "devpro-orchestrator"
 version = "0.1.0"
 description = "DevPro Orchestrator: Advanced Multi-Agent Orchestration System with LangGraph supervisor"
-authors = [{ name = "Bjorn Melin" }]
+authors = [{ name = "Shemayon Soloman" }]
 readme = "README.md"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
@@ -56,8 +56,8 @@ dependencies = [
 dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0", "ruff>=0.10.0"]
 
 [project.urls]
-Repository = "https://github.com/BjornMelin/dev-pro-agents"
-Documentation = "https://github.com/BjornMelin/dev-pro-agents/docs"
+Repository = "https://github.com/shemayon/DevPro-Orchestrator"
+Documentation = "https://github.com/shemayon/DevPro-Orchestrator/"
 
 [project.scripts]
 dev-pro-agents = "src.cli:main"

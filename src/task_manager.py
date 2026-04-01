@@ -33,8 +33,11 @@ from pydantic import (
 )
 
 from .schemas.unified_models import (
+    ComponentArea,
     DependencyType,
+    TaskComplexity,
     TaskCore,
+    TaskPriority,
     TaskStatus,
     get_status_progress_percentage,
 )
@@ -251,11 +254,12 @@ class TaskManager:
                 "id": row["id"],
                 "title": row["title"],
                 "description": row["description"] or "",
-                "component_area": row["component_area"],
+                # Coerce strings from SQLite to enum instances for Pydantic strict mode
+                "component_area": ComponentArea(row["component_area"]),
                 "phase": row["phase"],
-                "priority": row["priority"],
-                "complexity": row["complexity"],
-                "status": row["status"],
+                "priority": TaskPriority(row["priority"]),
+                "complexity": TaskComplexity(row["complexity"]),
+                "status": TaskStatus(row["status"]),
                 "source_document": row["source_document"] or "",
                 "success_criteria": row["success_criteria"] or "",
                 "time_estimate_hours": float(row["time_estimate_hours"]),
@@ -744,8 +748,8 @@ class TaskManager:
             progress = get_status_progress_percentage(task_status)
             cursor.execute(
                 """
-                INSERT INTO task_progress (task_id, progress_percentage, notes)
-                VALUES (?, ?, ?)
+                INSERT INTO task_progress (task_id, progress_percentage, notes, updated_by, created_at)
+                VALUES (?, ?, ?, 'supervisor', CURRENT_TIMESTAMP)
             """,
                 (task_id, progress, notes or f"Status changed to {status}"),
             )
@@ -761,6 +765,29 @@ class TaskManager:
                 )
 
             conn.commit()
+
+    def delete_task(self, task_id: int) -> bool:
+        """Delete a task and its related records by ID.
+
+        Args:
+            task_id: Task ID to delete
+
+        Returns:
+            True if the task was deleted, False if not found
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            # Delete related records first (FK cascade not always enabled)
+            cursor.execute("DELETE FROM task_progress WHERE task_id = ?", (task_id,))
+            cursor.execute("DELETE FROM task_comments WHERE task_id = ?", (task_id,))
+            cursor.execute("DELETE FROM task_dependencies WHERE task_id = ? OR depends_on_task_id = ?", (task_id, task_id))
+            cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+            rows_deleted = cursor.rowcount
+            conn.commit()
+            # Invalidate cache if present
+            self._task_cache.pop(f"task_{task_id}", None)
+            return rows_deleted > 0
+
 
     def get_tasks_by_phase(self, phase: int) -> list[dict]:
         """Get all tasks for a specific phase."""
@@ -796,14 +823,22 @@ class TaskManager:
         """Get all tasks with a specific status."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(
+            if status.lower() == "all":
+                cursor.execute(
+                    """
+                    SELECT * FROM tasks
+                    ORDER BY priority DESC, created_at ASC
                 """
-                SELECT * FROM tasks
-                WHERE status = ?
-                ORDER BY priority DESC, created_at ASC
-            """,
-                (status,),
-            )
+                )
+            else:
+                cursor.execute(
+                    """
+                    SELECT * FROM tasks
+                    WHERE status = ?
+                    ORDER BY priority DESC, created_at ASC
+                """,
+                    (status,),
+                )
 
             return [dict(row) for row in cursor.fetchall()]
 

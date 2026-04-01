@@ -4,7 +4,7 @@ import {
   Search, Code2, TestTube2, FileText,
   Plus, Play, RefreshCcw, CheckCircle2,
   AlertCircle, Clock, Loader2, Activity,
-  Zap, BarChart3, X, ChevronDown
+  Zap, BarChart3, X, ChevronDown, Trash2
 } from 'lucide-react';
 
 const API = '/api';
@@ -57,7 +57,7 @@ function AgentCard({ name, info, delay }) {
 }
 
 // ── Task Row ───────────────────────────────────
-function TaskRow({ task, onExecute, executing }) {
+function TaskRow({ task, onExecute, onDelete, executing }) {
   const s = STATUS_CONFIG[task.status] || STATUS_CONFIG.not_started;
   const canRun = task.status === 'not_started' || task.status === 'failed' || task.status === 'blocked';
   const isRunning = executing === task.id;
@@ -88,6 +88,17 @@ function TaskRow({ task, onExecute, executing }) {
             )
             : <span style={{color:'var(--text-muted)',fontSize:'.78rem'}}>—</span>
         }
+      </td>
+      <td>
+        <button
+          className="icon-btn"
+          title="Delete task"
+          style={{color:'var(--red,#f87171)'}}
+          onClick={() => { if (window.confirm(`Delete task #${task.id}?`)) onDelete(task.id); }}
+          disabled={executing !== null}
+        >
+          <Trash2 size={14}/>
+        </button>
       </td>
     </tr>
   );
@@ -206,6 +217,16 @@ export default function App() {
     }
   };
 
+  const deleteTask = async (id) => {
+    try {
+      await axios.delete(`${API}/tasks/${id}`);
+      setTasks(prev => prev.filter(t => t.id !== id));
+      showToast(`Task #${id} deleted`);
+    } catch {
+      showToast(`Could not delete task #${id}`, true);
+    }
+  };
+
   const stats = status?.task_statistics || {};
   const agents = status?.agents || {};
 
@@ -286,11 +307,12 @@ export default function App() {
                     <th>Component</th>
                     <th>Status</th>
                     <th>Action</th>
+                    <th>Delete</th>
                   </tr>
                 </thead>
                 <tbody>
                   {tasks.map(t => (
-                    <TaskRow key={t.id} task={t} onExecute={executeTask} executing={executing}/>
+                    <TaskRow key={t.id} task={t} onExecute={executeTask} onDelete={deleteTask} executing={executing}/>
                   ))}
                 </tbody>
               </table>

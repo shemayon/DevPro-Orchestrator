@@ -305,7 +305,7 @@ class Supervisor:
                 raise ValueError(f"Task {task_id} not found")
 
             # Update task status to in progress
-            await self.task_manager.update_task_status(task_id, TaskStatus.IN_PROGRESS)
+            self.task_manager.update_task_status(task_id, TaskStatus.IN_PROGRESS)
 
             # Create execution message
             user_message = self._format_task_message(task)
@@ -319,7 +319,7 @@ class Supervisor:
             # Update task status based on results
             success = self._analyze_execution_results(result)
             new_status = TaskStatus.COMPLETED if success else TaskStatus.BLOCKED
-            await self.task_manager.update_task_status(task_id, new_status)
+            self.task_manager.update_task_status(task_id, new_status)
 
             return {
                 "task_id": task_id,
@@ -331,7 +331,7 @@ class Supervisor:
 
         except Exception as e:
             logger.error(f"Task execution failed: {e}")
-            await self.task_manager.update_task_status(task_id, TaskStatus.BLOCKED)
+            self.task_manager.update_task_status(task_id, TaskStatus.BLOCKED)
 
             return {
                 "task_id": task_id,
